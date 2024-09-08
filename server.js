@@ -29,6 +29,10 @@ const languagesRoute = require("./routes/languages.route");
 const projectsRoute = require("./routes/projects.route");
 const subProjectsRoute = require("./routes/subProjects.route");
 const errorsRoute = require("./routes/errors.route");
+const sendMailRoute = require("./routes/mailSender.route");
+const smtpConfigurationRoute = require("./routes/smtpConfiguration.route");
+const supportEmailRoute = require("./routes/supportEmail.route");
+const consultHistoricRoute = require("./routes/consultHistoric.route");
 
 const port = process.env.PORT || 5000;
 
@@ -46,6 +50,10 @@ app.use("/mappings", mappingsRoute);
 app.use("/projects", projectsRoute);
 app.use("/subProjects", subProjectsRoute);
 app.use("/errors", errorsRoute);
+app.use("/sendMail", sendMailRoute);
+app.use("/smtpConfiguration", smtpConfigurationRoute);
+app.use("/supportEmail", supportEmailRoute);
+app.use("/consultHistoric", consultHistoricRoute);
 // -- route for the not-found
 app.use(notFoundMiddleware);
 

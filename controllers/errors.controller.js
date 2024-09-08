@@ -83,6 +83,42 @@ const createError = async (req, res) => {
         .catch(err => res.status(400).json('Error: ' + err));
 };
 
+const createErrorWithUpload = async (req, res) => {
+    const error = req.body;
+
+    const project = await Project.findOne({ name: error.project });
+    if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+    }
+
+    const subProject = await SubProject.findOne({ name: error.subProject, idProject: project._id });
+    if (!subProject) {
+        return res.status(404).json({ message: "subProject not found" });
+    }
+
+    const documentation = await Documentation.findOne({ title: error.document, idSubProject: subProject._id });
+    if (!documentation) {
+        return res.status(404).json({ message: "Documentation not found" });
+    }
+
+    const errorDocument = await Error.findOne({ idDocumentation: documentation._id, idSubProject: subProject._id });
+    if (errorDocument) {
+        return res.status(400).json({ message: "Error already exists" });
+    }
+
+    const newError = new Error({
+        idProject: project,
+        idSubProject: subProject,
+        idDocumentation: documentation
+    });
+
+    newError.save()
+        .then(() => {
+            res.json(newError)
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
+}
+
 const getError = (req, res) => {
     Error.findById(req.params.id)
         .populate("idProject")
@@ -117,6 +153,7 @@ module.exports = {
     getErrorsSafely,
     getErrorsBySubProject,
     createError,
+    createErrorWithUpload,
     getError,
     updateError,
     deleteError

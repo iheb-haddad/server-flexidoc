@@ -4,6 +4,7 @@ const router = express.Router();
 const {
     getErrors,
     createError,
+    createErrorWithUpload,
     getErrorsSafely,
     getErrorsBySubProject,
     deleteError,
@@ -13,6 +14,7 @@ const {
 
 router.get('/', getErrors);
 router.post('/', createError);
+router.post('/upload', createErrorWithUpload);
 router.get('/:user', getErrorsSafely);
 router.get('/subProject/:subProject', getErrorsBySubProject);
 router.get('/:id', getError);

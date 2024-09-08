@@ -5,6 +5,7 @@ const Project = require("../models/project.model");
 const User = require("../models/user.model");
 const getSubProjectsManagedByUser = require("./additionalControllers").getSubProjectsManagedByUser;
 const moment = require('moment');
+const ConsultHistoric = require("../models/conusltHistoric.model");
 
 const getDocumentations = async (req, res) => {
   try {
@@ -38,6 +39,152 @@ const getDocumentationsSafely = async (req, res) => {
           .populate("idProject")
           .populate("idSubProject");
         res.send(documents);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  } 
+};
+
+const getNbrConsultationOfDocuments = async (req, res) => {
+  const userId = req.params.user;
+  const subProjectId = req.query.idSubProject;
+  const fromDate = req.query.fromDate;
+  const toDate = req.query.toDate;
+  const user = await User.findOne({ _id: userId });
+  if(user){
+    if(user.role === "admin"){
+      try {
+        const result = await Documentation.find()
+          .populate("idProject")
+          .populate("idSubProject");
+        const filtredDocs = result.filter((doc) => doc.consultationNumber > 0 && (doc.idSubProject._id == subProjectId || subProjectId === ''));
+        if(fromDate === '' || toDate === '') {
+          const docs = filtredDocs.map((doc,index) => { return { _id: doc._id,
+              title: doc.title,
+              consultationNumber: doc.consultationNumber,
+              fill :(filtredDocs.length%10 === 1 && index === filtredDocs.length - 1 ) ? `hsl(var(--chart-${index%10 + 2}))`  :`hsl(var(--chart-${index%10 + 1}))` } }
+          );
+          res.send(docs);
+        }else{
+        const historic = await ConsultHistoric.find({ date: { $gte: fromDate, $lte: toDate }});
+        const docs = filtredDocs.map((doc,index) => { return { _id: doc._id,
+            title: doc.title,
+            consultationNumber: historic.filter((hist) => hist.idDocumentation.toString() == doc._id.toString()).length,
+            fill :(filtredDocs.length%10 === 1 && index === filtredDocs.length - 1 ) ? `hsl(var(--chart-${index%10 + 2}))`  :`hsl(var(--chart-${index%10 + 1}))` } });   
+        res.send(docs);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }else if(user.role === "user"){
+      try {
+        const subProjects = await getSubProjectsManagedByUser(userId);
+        const documents = await Documentation.find({ idSubProject: { $in: subProjects } })
+          .populate("idProject")
+          .populate("idSubProject");
+          const filtredDocs = documents.filter((doc) => doc.consultationNumber > 0 && (doc.idSubProject._id == subProjectId || subProjectId === ''));
+          if(fromDate === '' || toDate === '') {
+            const docs = filtredDocs.map((doc,index) => { return { _id: doc._id,
+                title: doc.title,
+                consultationNumber: doc.consultationNumber,
+                fill :(filtredDocs.length%10 === 1 && index === filtredDocs.length - 1 ) ? `hsl(var(--chart-${index%10 + 2}))`  :`hsl(var(--chart-${index%10 + 1}))` } }
+            );
+            res.send(docs);
+          }else{
+          const historic = await ConsultHistoric.find({ date: { $gte: fromDate, $lte: toDate }});
+          const docs = filtredDocs.map((doc,index) => { return { _id: doc._id,
+              title: doc.title,
+              consultationNumber: historic.filter((hist) => hist.idDocumentation.toString() == doc._id.toString()).length,
+              fill :(filtredDocs.length%10 === 1 && index === filtredDocs.length - 1 ) ? `hsl(var(--chart-${index%10 + 2}))`  :`hsl(var(--chart-${index%10 + 1}))` } });   
+          res.send(docs);
+          }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  } 
+};
+
+const getNbrConsultationPerDate = async (req, res) => {
+  const userId = req.params.user;
+  const subProjectId = req.query.idSubProject;
+  const fromDate = req.query.fromDate;
+  const toDate = req.query.toDate;
+  const user = await User.findOne({ _id: userId });
+  if(user){
+    if(user.role === "admin"){
+      try {
+        const result = await Documentation.find()
+          .populate("idProject")
+          .populate("idSubProject");
+        const filtredDocs = result.filter((doc) => doc.consultationNumber > 0 && (doc.idSubProject._id == subProjectId || subProjectId === ''));
+        if(fromDate === '' || toDate === '') {
+          const historic = await ConsultHistoric.find({ idDocumentation: { $in: filtredDocs.map((doc) => doc._id) }});
+          const aggregatedHistoric = historic.reduce((acc, hist) => {
+            const date = moment(hist.date).format("YYYY-MM-DD");
+            if (acc[date]) {
+              acc[date] += 1;
+            } else {
+              acc[date] = 1;
+            }
+            return acc;
+          }, {});
+          const finalResult = aggregatedHistoric ? Object.keys(aggregatedHistoric).map((key) => { return { date: key, nbrConsultation: aggregatedHistoric[key] } }) : [];
+          res.send(finalResult);
+        }else{
+          const historic = await ConsultHistoric.find({ idDocumentation: { $in: filtredDocs.map((doc) => doc._id) }});
+          const aggregatedHistoric = historic.reduce((acc, hist) => {
+            const date = moment(hist.date).format("YYYY-MM-DD");
+            if (acc[date]) {
+              acc[date] += 1;
+            } else {
+              acc[date] = 1;
+            }
+            return acc;
+          }, {});
+          const finalResult = aggregatedHistoric ? Object.keys(aggregatedHistoric).map((key) => { return { date: key, nbrConsultation: aggregatedHistoric[key] } }) : [];
+          const filtredResult = finalResult.filter((result) => moment(result.date).isBetween(fromDate, toDate, "day", "[]"));
+          res.send(filtredResult);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }else if(user.role === "user"){
+      try {
+        const subProjects = await getSubProjectsManagedByUser(userId);
+        const documents = await Documentation.find({ idSubProject: { $in: subProjects } })
+          .populate("idProject")
+          .populate("idSubProject");
+          const filtredDocs = documents.filter((doc) => doc.consultationNumber > 0 && (doc.idSubProject._id == subProjectId || subProjectId === ''));
+          if(fromDate === '' || toDate === '') {
+            const historic = await ConsultHistoric.find({ idDocumentation: { $in: filtredDocs.map((doc) => doc._id) }});
+            const aggregatedHistoric = historic.reduce((acc, hist) => {
+              const date = moment(hist.date).format("YYYY-MM-DD");
+              if (acc[date]) {
+                acc[date] += 1;
+              } else {
+                acc[date] = 1;
+              }
+              return acc;
+            }, {});
+            const finalResult = aggregatedHistoric ? Object.keys(aggregatedHistoric).map((key) => { return { date: key, nbrConsultation: aggregatedHistoric[key] } }) : [];
+            res.send(finalResult);
+          }else{
+            const historic = await ConsultHistoric.find({ idDocumentation: { $in: filtredDocs.map((doc) => doc._id) }});
+            const aggregatedHistoric = historic.reduce((acc, hist) => {
+              const date = moment(hist.date).format("YYYY-MM-DD");
+              if (acc[date]) {
+                acc[date] += 1;
+              } else {
+                acc[date] = 1;
+              }
+              return acc;
+            }, {});
+            const finalResult = aggregatedHistoric ? Object.keys(aggregatedHistoric).map((key) => { return { date: key, nbrConsultation: aggregatedHistoric[key] } }) : [];
+            const filtredResult = finalResult.filter((result) => moment(result.date).isBetween(fromDate, toDate, "day", "[]"));
+            res.send(filtredResult);
+          }
       } catch (err) {
         console.log(err);
       }
@@ -164,6 +311,19 @@ const updateDocumentation = async (req, res) => {
 	}
 };
 
+const updateLastConsultation = async (req, res) => {
+  const _id = req.params._id;
+  const updates = req.body;
+
+  try {
+    await Documentation.updateOne({ _id: _id}, updates);
+    res.status(200).send();
+  }
+  catch {
+    res.status(500).send();
+  }
+}
+
 const resetConsultationNumber = async (req, res) => {
   const _id = req.params._id;
   try {
@@ -190,9 +350,12 @@ const deleteDocumentation = async (req, res) => {
 module.exports = {
   getDocumentations,
   getDocumentationsSafely,
+  getNbrConsultationOfDocuments,
+  getNbrConsultationPerDate,
   createDocumentation,
   createDocumentationWithUpload,
   updateDocumentation,
+  updateLastConsultation,
   resetConsultationNumber,
-  deleteDocumentation,
+  deleteDocumentation
 };
