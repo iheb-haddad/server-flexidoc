@@ -14,7 +14,7 @@ const docSchema = new Schema(
     expiration: {type: Date},
     keywords: [{type: String}],
     consultationNumber: {type: Number},
-    lastConsultation: {type: String},
+    lastConsultation: {type: Date},
   },
   { timestamps: true }
 );

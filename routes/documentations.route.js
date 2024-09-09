@@ -10,8 +10,7 @@ const {
   updateDocumentation,
   updateLastConsultation,
   resetConsultationNumber,
-  deleteDocumentation,
-  iheb
+  deleteDocumentation
 } = require("../controllers/documentations.controller");
 
 router.get("/", getDocumentations);
