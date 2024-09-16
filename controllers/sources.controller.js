@@ -4,7 +4,8 @@ const SubProject = require("../models/subProject.model");
 const User = require("../models/user.model");
 const Project = require("../models/project.model");
 const Documentation = require("../models/documentation.model");
-const getSubProjectsManagedByUser = require("./additionalControllers").getSubProjectsManagedByUser;
+const getSubProjectsManagedByUser =
+  require("./additionalControllers").getSubProjectsManagedByUser;
 
 const getSources = async (req, res) => {
   try {
@@ -16,7 +17,7 @@ const getSources = async (req, res) => {
     console.log(err);
     res.status(500).send();
   }
-}
+};
 
 const getSourcesByUser = async (req, res) => {
   const userId = req.params.user;
@@ -39,28 +40,38 @@ const getSourcesByUser = async (req, res) => {
 
 const getSourcesByProject = async (req, res) => {
   const projectId = req.params.project;
-  const sources = await Source.find({ idProject : projectId })
+  const sources = await Source.find({ idProject: projectId })
     .populate("idProject")
     .populate("idSubProject");
   res.send(sources);
-}
+};
 
 const createSource = async (req, res) => {
   const source = req.body;
 
   const project = await Project.findOne({ _id: source.idProject });
   if (!project) {
-    return res.status(404).json({message : "Project not found"});
+    return res.status(404).json({ message: "Client not found" });
   }
 
-  const subProject = await SubProject.findOne({ _id: source.idSubProject , idProject: project._id});
+  const subProject = await SubProject.findOne({
+    _id: source.idSubProject,
+    idProject: project._id,
+  });
   if (!subProject) {
-    return res.status(404).json({message : "subProject not found"});
+    return res.status(404).json({ message: "Project not found" });
   }
 
-  const existingSource = await Source.findOne({ name: source.name, idSubProject: source.idSubProject });
+  const existingSource = await Source.findOne({
+    name: source.name,
+    idSubProject: source.idSubProject,
+  });
   if (existingSource) {
-    return res.status(400).json({message : "Source with this name already exists under this subProject"});
+    return res
+      .status(400)
+      .json({
+        message: "Source with this name already exists under this Project",
+      });
   }
 
   source.idProject = project;
@@ -72,26 +83,36 @@ const createSource = async (req, res) => {
 const createSourceWithUpload = async (req, res) => {
   const source = req.body;
 
-  const project = await Project.findOne({ name: source.project });
+  const project = await Project.findOne({ name: source.client });
   if (!project) {
-    return res.status(404).json({message : "Project not found"});
+    return res.status(404).json({ message: "Client not found" });
   }
 
-  const subProject = await SubProject.findOne({ name: source.subProject , idProject: project._id});
+  const subProject = await SubProject.findOne({
+    name: source.project,
+    idProject: project._id,
+  });
   if (!subProject) {
-    return res.status(404).json({message : "subProject not found"});
+    return res.status(404).json({ message: "Project not found" });
   }
 
-  const existingSource = await Source.findOne({ name: source.name, idSubProject: subProject._id });
+  const existingSource = await Source.findOne({
+    name: source.name,
+    idSubProject: subProject._id,
+  });
   if (existingSource) {
-    return res.status(400).json({message : "Source with this name already exists under this subProject"});
+    return res
+      .status(400)
+      .json({
+        message: "Source with this name already exists under this Project",
+      });
   }
 
   source.idProject = project;
   source.idSubProject = subProject;
   const newSource = await Source.create(source);
   res.status(201).send(newSource);
-}
+};
 
 const updateSource = async (req, res) => {
   const _id = req.params._id;
@@ -99,17 +120,28 @@ const updateSource = async (req, res) => {
 
   const project = await Project.findOne({ _id: updates.idProject });
   if (!project) {
-    return res.status(404).json({message : "Project not found"});
+    return res.status(404).json({ message: "Client not found" });
   }
 
-  const subProject = await SubProject.findOne({ _id: updates.idSubProject , idProject: project._id});
+  const subProject = await SubProject.findOne({
+    _id: updates.idSubProject,
+    idProject: project._id,
+  });
   if (!subProject) {
-    return res.status(404).json({message : "subProject not found"});
+    return res.status(404).json({ message: "Project not found" });
   }
 
-  const existingSource = await Source.findOne({ name: updates.name, idSubProject: updates.idSubProject , _id: { $ne: _id } });
+  const existingSource = await Source.findOne({
+    name: updates.name,
+    idSubProject: updates.idSubProject,
+    _id: { $ne: _id },
+  });
   if (existingSource) {
-    return res.status(400).json({message : "Source with this name already exists under this subProject"});
+    return res
+      .status(400)
+      .json({
+        message: "Source with this name already exists under this Project",
+      });
   }
 
   updates.idProject = project;

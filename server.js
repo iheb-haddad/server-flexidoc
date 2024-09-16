@@ -66,7 +66,7 @@ require("./jobs/cron");
 const start = async () => {
   try {
     await connectDb();
-    console.log('Connected to MongoDB');
+    console.log("Connected to MongoDB");
     app.listen(port, () => {
       console.log(`Server is running on port ${port}...`);
     });

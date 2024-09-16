@@ -11,7 +11,9 @@ const createSection = async (req, res) => {
 
   const existingSection = await Section.findOne({ titleFr: section.titleFr });
   if (existingSection) {
-    return res.status(400).json({ message: "Section with this title already exists" });
+    return res
+      .status(400)
+      .json({ message: "Section with this title already exists" });
   }
 
   await Section.create(section);

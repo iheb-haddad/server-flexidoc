@@ -1,6 +1,5 @@
 const Memo = require("../models/memos.model");
 
-
 const getMemos = async (req, res) => {
   try {
     const memos = await Memo.find().populate("idSource");

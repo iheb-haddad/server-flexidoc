@@ -5,7 +5,7 @@ const consultHistoricSchema = new Schema(
     {
         idDocumentation: { type: Schema.Types.ObjectId, ref: "documentation" },
         ipUser: { type: String },
-        urlConsulted: { type: String },
+        sourceConsultation: { type: String },
         date: { type: Date },
     }
 )

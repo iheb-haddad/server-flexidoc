@@ -15,6 +15,7 @@ const docSchema = new Schema(
     keywords: [{type: String}],
     consultationNumber: {type: Number},
     lastConsultation: {type: Date},
+    isError: {type: Boolean},
   },
   { timestamps: true }
 );
