@@ -18,7 +18,6 @@ const sendMail = async (req, res) => {
 
   const file = req.file;
   const screenshot = req.screenshot;
-  console.log(screenshot);
 
   const transporter = nodemailer.createTransport({
     host: smtpConfiguration.host,
@@ -31,21 +30,20 @@ const sendMail = async (req, res) => {
   });
   // send mail with defined transport object
   try {
+    const attachments = [];
+    if (file) {
+      attachments.push({ filename: file.originalname, content: file.buffer });
+    }
+    if (screenshot) {
+      attachments.push({ filename: 'screenshot.png', content: screenshot });
+    }
+
     const info = await transporter.sendMail({
       from: smtpConfiguration.user, // sender address
       to: supportEmail.email, // list of receivers
       subject: "Problème Flexidoc", // Subject line
       text: req.body.message, // plain text body
-      attachments: [
-        file && {
-          filename: file.originalname,
-          content: file.buffer,
-        },
-        screenshot && {
-          filename: screenshot.originalname,
-          content: screenshot.buffer,
-        },
-      ],
+      attachments: attachments.length > 0 ? attachments : [],
     });
     res.json({ message: "Email sent successfully", info: info });
 
