@@ -12,7 +12,13 @@ const confSchema = new Schema(
     memoSection: { type: String },
     generalUrl: { type: String },
     resizeBarWidth : { type: String },
-    timer : { type: Number}
+    timer : { type: Number},
+    backgroundLanguage: { type: String },
+    textColorLanguage: { type: String },
+    buttonMemoBgColor: { type: String },
+    buttonMemoFontColor: { type: String },
+    buttonMemoFontSize: { type: Number },
+    sectionEmailDisplay: { type: String },
   },
   { timestamps: true }
 );
