@@ -12,7 +12,14 @@ const sectionSchema = new Schema(
     backgroundColor: { type: String },
     fontSizeTitle : { type: String },
     fontSizeText : { type: String },
-    paddingUnderTitle : { type: String }
+    paddingUnderTitle : { type: String },
+    traitDisplay: { type: String },
+    traitColor: { type: String },
+    traitWidth: { type: String },
+    sectionBorderDisplay: { type: String },
+    sectionBorderColor: { type: String },
+    sectionBorderRound: { type: String },
+    redCircleWidth: { type: String },
   },
   { timestamps: true }
 );
