@@ -17,7 +17,7 @@ const confSchema = new Schema(
     textColorLanguage: { type: String },
     buttonMemoBgColor: { type: String },
     buttonMemoFontColor: { type: String },
-    buttonMemoFontSize: { type: Number },
+    buttonMemoFontSize: { type: String },
     sectionEmailDisplay: { type: String },
   },
   { timestamps: true }
