@@ -19,7 +19,6 @@ const sectionSchema = new Schema(
     sectionBorderDisplay: { type: String },
     sectionBorderColor: { type: String },
     sectionBorderRound: { type: String },
-    redCircleWidth: { type: String },
   },
   { timestamps: true }
 );
