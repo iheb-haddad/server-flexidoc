@@ -5,6 +5,8 @@ const sectionSchema = new Schema(
   {
     titleFr: { type: String },
     titleEn: { type: String },
+    customTitleFr: { type: String },
+    customTitleEn: { type: String },
     titlePolice: { type: String },
     textPolice: { type: String },
     titleColor: { type: String },
