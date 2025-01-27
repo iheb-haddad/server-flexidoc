@@ -1,6 +1,7 @@
 const ConsultHistoric = require("../models/conusltHistoric.model.js");
 const Documentation = require("../models/documentation.model.js");
 const moment = require("moment");
+const requestIp = require('request-ip');
 
 // Create and Save a new ConsultHistoric
 const createConsultHistoric = async (req, res) => {
@@ -11,6 +12,9 @@ const createConsultHistoric = async (req, res) => {
   if (!documentation) {
     return res.status(404).json({ message: "Documentation not found" });
   }
+  const clientIp = requestIp.getClientIp(req);
+  console.log(clientIp)
+  consultHistoric.ipUser = clientIp;
   consultHistoric.idDocumentation = documentation;
   const newConsultHistoric = new ConsultHistoric(consultHistoric);
   newConsultHistoric
