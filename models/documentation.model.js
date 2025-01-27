@@ -10,6 +10,8 @@ const docSchema = new Schema(
     status: {type: String},
     urlDoc: {type: String},
     display: {type: String},
+    collapsible : {type: Boolean},
+    defaultEtat : {type: Boolean},
     note : {type: String},
     expiration: {type: Date},
     keywords: [{type: String}],
