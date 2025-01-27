@@ -13,8 +13,8 @@ const createConsultHistoric = async (req, res) => {
     return res.status(404).json({ message: "Documentation not found" });
   }
   const clientIp = requestIp.getClientIp(req);
-  console.log(clientIp)
-  consultHistoric.ipUser = clientIp;
+  
+  consultHistoric.ipUser = clientIp === '::1' ? '127.0.0.1' : clientIp;
   consultHistoric.idDocumentation = documentation;
   const newConsultHistoric = new ConsultHistoric(consultHistoric);
   newConsultHistoric
