@@ -21,6 +21,7 @@ const sectionSchema = new Schema(
     sectionBorderDisplay: { type: String },
     sectionBorderColor: { type: String },
     sectionBorderRound: { type: String },
+    order: { type: Number },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ const getSubProjectsManagedByUser =
   require("./additionalControllers").getSubProjectsManagedByUser;
 const moment = require("moment");
 const ConsultHistoric = require("../models/conusltHistoric.model");
+const { getProjectsManagedByUser } = require("./additionalControllers");
 
 const getDocumentations = async (req, res) => {
   try {
@@ -96,7 +97,9 @@ const getDocumentationsSafelyWithDate = async (req, res) => {
 
 const getNbrConsultationOfDocuments = async (req, res) => {
   const userId = req.params.user;
+  const projectId = req.query.idProject;
   const subProjectId = req.query.idSubProject;
+  const sourceId = req.query.idSource;
   const fromDate = req.query.fromDate;
   const toDate = req.query.toDate;
   const user = await User.findOne({ _id: userId });
@@ -106,11 +109,26 @@ const getNbrConsultationOfDocuments = async (req, res) => {
         const result = await Documentation.find()
           .populate("idProject")
           .populate("idSubProject");
-        const filtredDocs = result.filter(
-          (doc) =>
-            doc.consultationNumber > 0 &&
-            (doc.idSubProject._id == subProjectId || subProjectId === "")
-        );
+        const filtredDocs = sourceId
+          ? mappings
+              .filter(
+                (mapping) =>
+                  mapping.idDocument.consultationNumber > 0 &&
+                  mapping.idSource._id == sourceId
+              )
+              .map((mapping) => mapping.idDocument)
+          : subProjectId
+          ? result.filter(
+              (doc) =>
+                doc.consultationNumber > 0 &&
+                doc.idSubProject._id == subProjectId
+            )
+          : projectId
+          ? result.filter(
+              (doc) =>
+                doc.consultationNumber > 0 && doc.idProject._id == projectId
+            )
+          : result.filter((doc) => doc.consultationNumber > 0);
         if (fromDate === "" || toDate === "") {
           const docs = filtredDocs.map((doc, index) => {
             return {
@@ -150,17 +168,46 @@ const getNbrConsultationOfDocuments = async (req, res) => {
       }
     } else if (user.role === "user") {
       try {
+        const projects = await getProjectsManagedByUser(userId);
         const subProjects = await getSubProjectsManagedByUser(userId);
-        const documents = await Documentation.find({
-          idSubProject: { $in: subProjects },
-        })
-          .populate("idProject")
-          .populate("idSubProject");
-        const filtredDocs = documents.filter(
-          (doc) =>
-            doc.consultationNumber > 0 &&
-            (doc.idSubProject._id == subProjectId || subProjectId === "")
-        );
+        const documents =
+          subProjectId && !sourceId
+            ? await Documentation.find({
+                idSubProject: { $in: subProjects },
+              })
+                .populate("idProject")
+                .populate("idSubProject")
+            : !sourceId
+            ? await Documentation.find({
+                idProject: { $in: projects },
+              })
+                .populate("idProject")
+                .populate("idSubProject")
+            : [];
+
+        const mappings = sourceId
+          ? await Mapping.find().populate("idSource").populate("idDocument")
+          : [];
+        const filtredDocs = sourceId
+          ? mappings
+              .filter(
+                (mapping) =>
+                  mapping.idDocument.consultationNumber > 0 &&
+                  mapping.idSource._id == sourceId
+              )
+              .map((mapping) => mapping.idDocument)
+          : subProjectId
+          ? documents.filter(
+              (doc) =>
+                doc.consultationNumber > 0 &&
+                doc.idSubProject._id == subProjectId
+            )
+          : projectId
+          ? documents.filter(
+              (doc) =>
+                doc.consultationNumber > 0 && doc.idProject._id == projectId
+            )
+          : documents.filter((doc) => doc.consultationNumber > 0);
         if (fromDate === "" || toDate === "") {
           const docs = filtredDocs.map((doc, index) => {
             return {
@@ -204,21 +251,45 @@ const getNbrConsultationOfDocuments = async (req, res) => {
 
 const getNbrConsultationPerDate = async (req, res) => {
   const userId = req.params.user;
+  const projectId = req.query.idProject;
   const subProjectId = req.query.idSubProject;
+  const sourceId = req.query.idSource;
   const fromDate = req.query.fromDate;
   const toDate = req.query.toDate;
   const user = await User.findOne({ _id: userId });
   if (user) {
     if (user.role === "admin") {
       try {
-        const result = await Documentation.find()
-          .populate("idProject")
-          .populate("idSubProject");
-        const filtredDocs = result.filter(
-          (doc) =>
-            doc.consultationNumber > 0 &&
-            (doc.idSubProject._id == subProjectId || subProjectId === "")
-        );
+        const result = !sourceId
+          ? await Documentation.find()
+              .populate("idProject")
+              .populate("idSubProject")
+          : [];
+
+        const mappings = sourceId
+          ? await Mapping.find().populate("idSource").populate("idDocument")
+          : [];
+
+        const filtredDocs = sourceId
+          ? mappings
+              .filter(
+                (mapping) =>
+                  mapping.idDocument.consultationNumber > 0 &&
+                  mapping.idSource._id == sourceId
+              )
+              .map((mapping) => mapping.idDocument)
+          : subProjectId
+          ? result.filter(
+              (doc) =>
+                doc.consultationNumber > 0 &&
+                doc.idSubProject._id == subProjectId
+            )
+          : projectId
+          ? result.filter(
+              (doc) =>
+                doc.consultationNumber > 0 && doc.idProject._id == projectId
+            )
+          : result.filter((doc) => doc.consultationNumber > 0);
         if (fromDate === "" || toDate === "") {
           const historic = await ConsultHistoric.find({
             idDocumentation: { $in: filtredDocs.map((doc) => doc._id) },
@@ -266,17 +337,47 @@ const getNbrConsultationPerDate = async (req, res) => {
       }
     } else if (user.role === "user") {
       try {
+        const projects = await getProjectsManagedByUser(userId);
         const subProjects = await getSubProjectsManagedByUser(userId);
-        const documents = await Documentation.find({
-          idSubProject: { $in: subProjects },
-        })
-          .populate("idProject")
-          .populate("idSubProject");
-        const filtredDocs = documents.filter(
-          (doc) =>
-            doc.consultationNumber > 0 &&
-            (doc.idSubProject._id == subProjectId || subProjectId === "")
-        );
+        const documents =
+          subProjectId && !sourceId
+            ? await Documentation.find({
+                idSubProject: { $in: subProjects },
+              })
+                .populate("idProject")
+                .populate("idSubProject")
+            : !sourceId
+            ? await Documentation.find({
+                idProject: { $in: projects },
+              })
+                .populate("idProject")
+                .populate("idSubProject")
+            : [];
+
+        const mappings = sourceId
+          ? await Mapping.find().populate("idSource").populate("idDocument")
+          : [];
+
+        const filtredDocs = sourceId
+          ? mappings
+              .filter(
+                (mapping) =>
+                  mapping.idDocument.consultationNumber > 0 &&
+                  mapping.idSource._id == sourceId
+              )
+              .map((mapping) => mapping.idDocument)
+          : subProjectId
+          ? documents.filter(
+              (doc) =>
+                doc.consultationNumber > 0 &&
+                doc.idSubProject._id == subProjectId
+            )
+          : projectId
+          ? documents.filter(
+              (doc) =>
+                doc.consultationNumber > 0 && doc.idProject._id == projectId
+            )
+          : documents.filter((doc) => doc.consultationNumber > 0);
         if (fromDate === "" || toDate === "") {
           const historic = await ConsultHistoric.find({
             idDocumentation: { $in: filtredDocs.map((doc) => doc._id) },
@@ -347,11 +448,9 @@ const createDocumentation = async (req, res) => {
     idSubProject: doc.idSubProject,
   });
   if (document) {
-    return res
-      .status(400)
-      .json({
-        message: "document with this title already exists under this Project",
-      });
+    return res.status(400).json({
+      message: "document with this title already exists under this Project",
+    });
   }
 
   doc.idProject = project;
@@ -397,11 +496,9 @@ const createDocumentationWithUpload = async (req, res) => {
     idSubProject: subProject._id,
   });
   if (document) {
-    return res
-      .status(400)
-      .json({
-        message: "document with this title already exists under this Project",
-      });
+    return res.status(400).json({
+      message: "document with this title already exists under this Project",
+    });
   }
 
   doc.idProject = project;
@@ -449,11 +546,9 @@ const updateDocumentation = async (req, res) => {
     _id: { $ne: _id },
   });
   if (document) {
-    return res
-      .status(400)
-      .json({
-        message: "document with this title already exists under this Project",
-      });
+    return res.status(400).json({
+      message: "document with this title already exists under this Project",
+    });
   }
 
   updates.idProject = project;
