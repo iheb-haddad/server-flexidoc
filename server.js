@@ -33,6 +33,7 @@ const sendMailRoute = require("./routes/mailSender.route");
 const smtpConfigurationRoute = require("./routes/smtpConfiguration.route");
 const supportEmailRoute = require("./routes/supportEmail.route");
 const consultHistoricRoute = require("./routes/consultHistoric.route");
+const themesRoute = require("./routes/themes.route");
 
 const port = process.env.PORT || 5000;
 
@@ -54,6 +55,7 @@ app.use("/sendMail", sendMailRoute);
 app.use("/smtpConfiguration", smtpConfigurationRoute);
 app.use("/supportEmail", supportEmailRoute);
 app.use("/consultHistoric", consultHistoricRoute);
+app.use("/themes", themesRoute);
 // -- route for the not-found
 app.use(notFoundMiddleware);
 

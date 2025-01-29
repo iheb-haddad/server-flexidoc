@@ -19,6 +19,7 @@ const sectionSchema = new Schema(
     traitColor: { type: String },
     traitWidth: { type: String },
     sectionBorderDisplay: { type: String },
+    sectionBorderWidth: { type: String },
     sectionBorderColor: { type: String },
     sectionBorderRound: { type: String },
     order: { type: Number },
