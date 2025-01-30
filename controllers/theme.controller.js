@@ -34,7 +34,7 @@ const updateTheme = async (req, res) => {
 }
 
 const deleteTheme = async (req, res) => {
-    const themeId = req.params.theme;
+    const themeId = req.params._id;
     await Theme.deleteOne({ _id: themeId });
     res.status(200).send();
 }

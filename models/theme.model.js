@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const themeSchema = new Schema(
   {
     name: { type: String },
-    desciption: { type: String },
+    description: { type: String },
     configuration: {
       panelColor: { type: String },
       panelTextColor: { type: String },
