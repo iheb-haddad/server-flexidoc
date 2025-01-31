@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const sectionSchema = new Schema(
   {
     titleFr: { type: String },
+    titleEn: { type: String },
     customTitles: [
       {
         title: { type: String },
