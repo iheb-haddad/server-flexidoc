@@ -22,6 +22,15 @@ const confSchema = new Schema(
     fontTitleMemo: { type: String },
     fontTextMemo: { type: String },
     arrondiMemo: { type: String },
+    textMemoSize: { type: String },
+    titleMemoSize: { type: String },
+    paddingUnderTitle: { type: String },
+    traitDisplay: { type: String },
+    traitColor: { type: String },
+    traitWidth: { type: String },
+    sectionBorderDisplay: { type: String },
+    sectionBorderWidth: { type: String },
+    sectionBorderColor: { type: String },
   },
   { timestamps: true }
 );
