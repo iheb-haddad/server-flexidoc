@@ -8,6 +8,7 @@ const confSchema = new Schema(
     panelTextColor: { type: String },
     panelWidth: { type: String },
     memoBackgroundColor: { type: String },
+    memoTitleColor: { type: String },
     memoFontColor: { type: String },
     memoSection: { type: String },
     generalUrl: { type: String },
