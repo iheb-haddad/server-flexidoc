@@ -20,6 +20,7 @@ const confSchema = new Schema(
     buttonMemoFontColor: { type: String },
     buttonMemoFontSize: { type: String },
     sectionEmailDisplay: { type: String },
+    btnCloseAllDisplay: { type: String },
     fontTitleMemo: { type: String },
     fontTextMemo: { type: String },
     arrondiMemo: { type: String },

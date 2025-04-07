@@ -18,6 +18,8 @@ const docSchema = new Schema(
     consultationNumber: {type: Number},
     lastConsultation: {type: Date},
     isError: {type: Boolean},
+    frameWidth: {type: String},
+    frameHeight: {type: String},
   },
   { timestamps: true }
 );
