@@ -68,6 +68,21 @@ const getConsultHistoricsByDocumentation = (req, res) => {
     });
 };
 
+const getConsultHistoricsByDocs = (req, res) => {
+  const idsDocs = req.params.idsDocs.split(",");
+  ConsultHistoric.find({ idDocumentation: { $in: idsDocs } })
+    .populate("idDocumentation")
+    .then((consultHistorics) => {
+      if (!consultHistorics) {
+        return res.status(404).json({ message: "ConsultHistoric not found" });
+      }
+      res.send(consultHistorics);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
+    });
+};
+
 const deleteConsultHistoric = (req, res) => {
   const id = req.params._id;
   ConsultHistoric.findOneAndDelete
@@ -101,6 +116,7 @@ module.exports = {
   getConsultHistorics,
   getConsultHistoric,
   getConsultHistoricsByDocumentation,
+  getConsultHistoricsByDocs,
   deleteConsultHistoric,
   deleteAllHistoricOfDocumentation,
 };
