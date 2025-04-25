@@ -514,7 +514,7 @@ const createDocumentationWithUpload = async (req, res) => {
     } catch (err) {
       res.status(403).json({ message: "error with expiration format" + err });
     }
-  }
+  } 
   try {
     await Documentation.create(doc);
     res.status(201).send();
@@ -564,6 +564,8 @@ const updateDocumentation = async (req, res) => {
     } catch {
       return res.status(403).json({ message: "error with expiration format" });
     }
+  } else {
+    doc.status = "public";
   }
 
   try {
