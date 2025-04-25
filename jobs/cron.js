@@ -2,7 +2,7 @@ const cronJobs = require("node-cron");
 const moment = require("moment");
 const Documentation = require("../models/documentation.model");
 
-cronJobs.schedule("0 0 * * *", async () => {
+cronJobs.schedule("*/10 * * * *", async () => {
   try {
     const documents = await Documentation.find();
     for (const document of documents) {

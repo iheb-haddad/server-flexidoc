@@ -560,6 +560,8 @@ const updateDocumentation = async (req, res) => {
       updates.expiration = moment(updates.expiration).format("YYYY-MM-DD");
       if (moment(updates.expiration).isBefore(moment(), "day")) {
         updates.status = "expiré";
+      } else {
+        updates.status = "public";
       }
     } catch {
       return res.status(403).json({ message: "error with expiration format" });
