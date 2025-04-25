@@ -565,7 +565,7 @@ const updateDocumentation = async (req, res) => {
       return res.status(403).json({ message: "error with expiration format" });
     }
   } else {
-    doc.status = "public";
+    updates.status = "public";
   }
 
   try {
